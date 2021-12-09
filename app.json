@@ -1,27 +1,27 @@
 {
   "expo": {
-    "name": "deviceapp",
-    "slug": "deviceapp",
+    "name": "Notes",
+    "slug": "notes",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/pencilNote.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/pencilNote.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "package": "com.mbembers.notes",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/pencilNote.png",
         "backgroundColor": "#FFFFFF"
       }
     },
