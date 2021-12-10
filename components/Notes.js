@@ -34,6 +34,7 @@ class Notes extends Component {
   async getNotes() {
     let ids = await this.getItem("ids");
     ids = JSON.parse(ids);
+    if (ids === null) ids = [];
     let notes = [];
     for (let id of ids) {
       let note = await this.getItem(id);
@@ -80,7 +81,20 @@ class Notes extends Component {
         <TouchableOpacity
           style={{ ...styles.note, backgroundColor: item.color }}
           onLongPress={() => this.showAlert(item.id)}
+          onPress={() => {
+            this.props.navigation.navigate("EditNote", {
+              id: item.id,
+              title: item.title,
+              desc: item.desc,
+              category: item.category,
+            });
+          }}
         >
+          <View style={styles.badge}>
+            <Text key="cat" style={styles.badgeText}>
+              {item.category}
+            </Text>
+          </View>
           <Text key="date" style={{ ...styles.text, textAlign: "right" }}>
             {item.date}
           </Text>
@@ -111,7 +125,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#333350",
-    padding: 15,
+    paddingTop: 10,
   },
   note: {
     padding: 15,
@@ -125,7 +139,16 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: "white",
   },
-  flatlist: {},
+  badge: {
+    flexDirection: "row",
+  },
+  badgeText: {
+    padding: 7,
+    borderRadius: 12,
+    backgroundColor: "#333350",
+    color: "#fff",
+    textAlign: "center",
+  },
 });
 
 export default Notes;

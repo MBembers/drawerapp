@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Image, StyleSheet, Text } from "react-native";
+import { Image, StyleSheet, Text, Alert } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import {
   DrawerContentScrollView,
@@ -9,7 +9,8 @@ import {
 } from "@react-navigation/drawer";
 import AddNote from "./components/AddNote";
 import Notes from "./components/Notes";
-import { Alert } from "react-native";
+import AddCategory from "./components/AddCategory.js";
+import EditNote from "./components/EditNote.js";
 
 const Drawer = createDrawerNavigator();
 
@@ -33,25 +34,27 @@ export default function App() {
           component={Notes}
           options={{
             ...headerStyles,
-            drawerIcon: () => (
-              <Image
-                style={styles.icon}
-                source={require("./assets/clipboard.png")}
-              />
-            ),
           }}
         />
         <Drawer.Screen
-          name="Add Note"
+          name="AddNote"
           component={AddNote}
           options={{
             ...headerStyles,
-            drawerIcon: () => (
-              <Image
-                style={styles.icon}
-                source={require("./assets/plus.png")}
-              />
-            ),
+          }}
+        />
+        <Drawer.Screen
+          name="AddCategory"
+          component={AddCategory}
+          options={{
+            ...headerStyles,
+          }}
+        />
+        <Drawer.Screen
+          name="EditNote"
+          component={EditNote}
+          options={{
+            ...headerStyles,
           }}
         />
       </Drawer.Navigator>
@@ -71,7 +74,30 @@ function CustomDrawerContent(props) {
           />
         )}
       />
-      <DrawerItemList {...props} />
+      <DrawerItem
+        label={() => <Text style={{ color: "white" }}>Notes</Text>}
+        icon={() => (
+          <Image
+            style={styles.icon}
+            source={require("./assets/clipboard.png")}
+          />
+        )}
+        onPress={() => props.navigation.navigate("Notes")}
+      />
+      <DrawerItem
+        label={() => <Text style={{ color: "white" }}>Add Note</Text>}
+        icon={() => (
+          <Image style={styles.icon} source={require("./assets/plus.png")} />
+        )}
+        onPress={() => props.navigation.navigate("AddNote")}
+      />
+      <DrawerItem
+        label={() => <Text style={{ color: "white" }}>Add Category</Text>}
+        icon={() => (
+          <Image style={styles.icon} source={require("./assets/plus.png")} />
+        )}
+        onPress={() => props.navigation.navigate("AddCategory")}
+      />
       <DrawerItem
         label={() => <Text style={{ color: "white" }}>info</Text>}
         icon={() => (

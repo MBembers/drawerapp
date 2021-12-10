@@ -7,6 +7,7 @@ import {
   TextInput,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { Picker } from "@react-native-picker/picker";
 
 class Addnote extends Component {
   constructor(props) {
@@ -14,6 +15,7 @@ class Addnote extends Component {
     this.state = {
       titleText: "",
       descText: "",
+      selectedCategory: "cat",
     };
   }
   async saveItem(key, value) {
@@ -37,7 +39,7 @@ class Addnote extends Component {
     ids = JSON.parse(ids);
     console.log("adding note / ids", ids);
     let newId = "";
-    if (ids === null) {
+    if (!ids || ids.length === 0) {
       ids = [];
       newId = "n1";
     } else {
@@ -56,6 +58,7 @@ class Addnote extends Component {
       id: newId,
       title: this.state.titleText,
       desc: this.state.descText,
+      category: this.state.selectedCategory,
       color: this.randomColor(),
       date: saveDate,
     };
@@ -67,6 +70,7 @@ class Addnote extends Component {
     this.setState({ titleText: "", descText: "" });
     this.props.navigation.jumpTo("Notes");
   }
+
   async checkKeys() {
     let ids = await this.getItem("ids");
     ids = JSON.parse(ids);
@@ -77,6 +81,11 @@ class Addnote extends Component {
       console.log("Note", note);
     }
     await this.deleteItem("ids");
+  }
+
+  changeCategory(category) {
+    this.setState({ selectedCategory: category });
+    console.log(this.state.selectedCategory);
   }
 
   render() {
@@ -110,6 +119,17 @@ class Addnote extends Component {
             });
           }}
         />
+        <Picker
+          // style={styles.picker}
+          selectedValue={this.state.selectedCategory}
+          onValueChange={(itemValue, itemIndex) =>
+            this.changeCategory(itemValue)
+          }
+        >
+          {/*    <Picker.Item label="AAA" value="a" />
+             <Picker.Item label="BBB" value="a" />
+             <Picker.Item label="CCC" value="a" /> */}
+        </Picker>
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
@@ -118,14 +138,14 @@ class Addnote extends Component {
         >
           <Text style={styles.text}>Add</Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.button}
           onPress={() => {
             this.checkKeys();
           }}
         >
           <Text style={styles.text}>check</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     );
   }
@@ -157,6 +177,12 @@ const styles = StyleSheet.create({
   text: {
     textAlign: "center",
     color: "white",
+  },
+  picker: {
+    alignSelf: "center",
+    marginTop: 10,
+    width: 240,
+    backgroundColor: "#fff",
   },
 });
 
