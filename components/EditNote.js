@@ -17,7 +17,22 @@ export default class EditNote extends Component {
       selectedCategory: this.props.route.params.category,
       titleText: this.props.route.params.title,
       descText: this.props.route.params.desc,
+      categories: [],
+      color: this.props.route.params.color,
+      date: this.props.route.params.date,
     };
+    this.fetchCategories();
+    this.props.navigation.addListener("focus", () => {
+      this.fetchCategories();
+      this.setState({
+        id: this.props.route.params.id,
+        selectedCategory: this.props.route.params.category,
+        titleText: this.props.route.params.title,
+        descText: this.props.route.params.desc,
+        color: this.props.route.params.color,
+        date: this.props.route.params.date,
+      });
+    });
   }
   async saveItem(key, value) {
     await SecureStore.setItemAsync(key, JSON.stringify(value));
@@ -28,6 +43,31 @@ export default class EditNote extends Component {
   }
   async deleteItem(key) {
     await SecureStore.deleteItemAsync(key);
+  }
+  async fetchCategories() {
+    let categories = await this.getItem("categories");
+    if (categories === null || categories.length === 0) {
+      categories = [];
+    }
+    this.setState({ categories: categories });
+    console.log("fetch categories: ", this.state.categories);
+  }
+
+  changeCategory(category) {
+    this.setState({ selectedCategory: category });
+    console.log(this.state.selectedCategory);
+  }
+  async editNote() {
+    let note = {
+      id: this.state.id,
+      color: this.state.color,
+      category: this.state.selectedCategory,
+      title: this.state.titleText,
+      desc: this.state.descText,
+      date: this.state.date,
+    };
+    await this.saveItem(this.state.id, note);
+    this.props.navigation.jumpTo("Notes");
   }
   render() {
     return (
@@ -65,20 +105,20 @@ export default class EditNote extends Component {
           }}
         />
         <Picker
-          // style={styles.picker}
+          style={styles.picker}
           selectedValue={this.state.selectedCategory}
           onValueChange={(itemValue, itemIndex) =>
             this.changeCategory(itemValue)
           }
         >
-          {/*    <Picker.Item label="AAA" value="a" />
-           <Picker.Item label="BBB" value="a" />
-           <Picker.Item label="CCC" value="a" /> */}
+          {this.state.categories.map((c) => (
+            <Picker.Item label={c} value={c} key={c} />
+          ))}
         </Picker>
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
-            this.EditNote();
+            this.editNote();
           }}
         >
           <Text style={styles.text}>Edit</Text>
@@ -124,8 +164,9 @@ const styles = StyleSheet.create({
   },
   picker: {
     alignSelf: "center",
+    color: "white",
     marginTop: 10,
     width: 240,
-    backgroundColor: "#fff",
+    backgroundColor: "#666699",
   },
 });

@@ -16,7 +16,13 @@ class Addnote extends Component {
       titleText: "",
       descText: "",
       selectedCategory: "cat",
+      categories: [],
     };
+
+    this.fetchCategories();
+    this.props.navigation.addListener("focus", () => {
+      this.fetchCategories();
+    });
   }
   async saveItem(key, value) {
     await SecureStore.setItemAsync(key, value);
@@ -87,6 +93,14 @@ class Addnote extends Component {
     this.setState({ selectedCategory: category });
     console.log(this.state.selectedCategory);
   }
+  async fetchCategories() {
+    let categories = JSON.parse(await this.getItem("categories"));
+    if (categories === null || categories.length === 0) {
+      categories = [];
+    }
+    this.setState({ categories: categories });
+    console.log("fetch categories: ", this.state.categories);
+  }
 
   render() {
     return (
@@ -120,15 +134,15 @@ class Addnote extends Component {
           }}
         />
         <Picker
-          // style={styles.picker}
+          style={styles.picker}
           selectedValue={this.state.selectedCategory}
           onValueChange={(itemValue, itemIndex) =>
             this.changeCategory(itemValue)
           }
         >
-          {/*    <Picker.Item label="AAA" value="a" />
-             <Picker.Item label="BBB" value="a" />
-             <Picker.Item label="CCC" value="a" /> */}
+          {this.state.categories.map((c) => (
+            <Picker.Item label={c} value={c} key={c} />
+          ))}
         </Picker>
         <TouchableOpacity
           style={styles.button}
@@ -138,14 +152,14 @@ class Addnote extends Component {
         >
           <Text style={styles.text}>Add</Text>
         </TouchableOpacity>
-        {/* <TouchableOpacity
+        <TouchableOpacity
           style={styles.button}
           onPress={() => {
             this.checkKeys();
           }}
         >
           <Text style={styles.text}>check</Text>
-        </TouchableOpacity> */}
+        </TouchableOpacity>
       </View>
     );
   }

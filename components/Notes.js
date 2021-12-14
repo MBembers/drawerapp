@@ -8,12 +8,15 @@ import {
   FlatList,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { TextInput } from "react-native-gesture-handler";
 
 class Notes extends Component {
   constructor(props) {
     super(props);
     this.state = {
       notes: [],
+      filterText: "",
+      actualnotes: [],
     };
     this.getNotes();
     this.props.navigation.addListener("focus", () => {
@@ -40,7 +43,7 @@ class Notes extends Component {
       let note = await this.getItem(id);
       notes.push(JSON.parse(note));
     }
-    this.setState({ notes: notes });
+    this.setState({ notes: notes, actualnotes: notes });
   }
 
   showAlert(delid) {
@@ -72,9 +75,28 @@ class Notes extends Component {
       }
     );
   }
+  async filterNotes(text) {
+    console.log("FILTER TEXT", text);
+    if (text === "") {
+      this.setState(({ notes }) => ({
+        actualnotes: notes,
+      }));
+    } else {
+      this.setState({
+        actualnotes: this.state.notes.filter((n) => {
+          return (
+            n.title.includes(text) ||
+            n.desc.includes(text) ||
+            n.category.includes(text)
+          );
+        }),
+      });
+    }
+    this.setState({ filterText: text });
+  }
 
   render() {
-    let notes = this.state.notes;
+    let notes = this.state.actualnotes;
     console.log("render notes:", notes);
     const renderItem = ({ item }) => {
       return (
@@ -87,6 +109,8 @@ class Notes extends Component {
               title: item.title,
               desc: item.desc,
               category: item.category,
+              color: item.color,
+              date: item.date,
             });
           }}
         >
@@ -109,6 +133,19 @@ class Notes extends Component {
     };
     return (
       <View key="vvvvv" style={styles.container}>
+        <TextInput
+          ref={(input) => {
+            this.filterInput = input;
+          }}
+          style={styles.input}
+          underlineColorAndroid="#666699"
+          placeholder="Filter..."
+          placeholderTextColor="white"
+          value={this.state.filterText}
+          onChangeText={(text) => {
+            this.filterNotes(text);
+          }}
+        />
         <FlatList
           style={styles.flatlist}
           data={notes}
@@ -148,6 +185,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#333350",
     color: "#fff",
     textAlign: "center",
+  },
+  input: {
+    textAlign: "center",
+    height: 60,
+    width: 240,
+    alignSelf: "center",
+    color: "white",
   },
 });
 

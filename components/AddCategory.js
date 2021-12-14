@@ -39,6 +39,8 @@ export default class AddCategory extends Component {
       new_categories.push(this.state.category);
       await this.saveItem("categories", new_categories);
       await this.fetchCategories();
+      this.props.navigation.jumpTo("Notes");
+      this.titleInput.clear();
     }
   }
   async fetchCategories() {
