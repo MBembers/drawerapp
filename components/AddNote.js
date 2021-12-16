@@ -52,14 +52,8 @@ class Addnote extends Component {
       let idss = ids.map((id) => parseInt(id.slice(1)));
       newId = "n" + String(Math.max.apply(null, idss) + 1);
     }
-    const today = new Date();
-    const options = {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    };
-    const saveDate = today.toLocaleDateString("pl-PL", options);
+    const today = Date.now();
+    const saveDate = today;
     let newNote = {
       id: newId,
       title: this.state.titleText,

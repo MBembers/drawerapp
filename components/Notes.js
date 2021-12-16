@@ -11,16 +11,56 @@ import * as SecureStore from "expo-secure-store";
 import { TextInput } from "react-native-gesture-handler";
 
 class Notes extends Component {
+  styles;
   constructor(props) {
     super(props);
     this.state = {
       notes: [],
       filterText: "",
       actualnotes: [],
+      fontSize: "normal",
+      sorting: "oldest to newest",
     };
     this.getNotes();
     this.props.navigation.addListener("focus", () => {
       this.getNotes();
+    });
+    this.styles = StyleSheet.create({
+      container: {
+        flex: 1,
+        backgroundColor: "#333350",
+        paddingTop: 10,
+      },
+      note: {
+        padding: 15,
+        margin: 10,
+        width: 170,
+        height: 170,
+        color: "white",
+        borderRadius: 8,
+      },
+      text: {
+        fontSize: 17,
+        color: "white",
+        overflow: "hidden",
+      },
+      badge: {
+        flexDirection: "row",
+      },
+      badgeText: {
+        padding: 7,
+        borderRadius: 12,
+        backgroundColor: "#333350",
+        color: "#fff",
+        textAlign: "center",
+      },
+      input: {
+        textAlign: "center",
+        height: 60,
+        width: 240,
+        alignSelf: "center",
+        color: "white",
+      },
     });
   }
   async saveItem(key, value) {
@@ -43,7 +83,13 @@ class Notes extends Component {
       let note = await this.getItem(id);
       notes.push(JSON.parse(note));
     }
-    this.setState({ notes: notes, actualnotes: notes });
+    const settings = JSON.parse(await this.getItem("settings"));
+    this.setState({
+      notes: notes,
+      actualnotes: notes,
+      fontSize: settings.fontSize,
+      sorting: settings.sorting,
+    });
   }
 
   showAlert(delid) {
@@ -97,11 +143,33 @@ class Notes extends Component {
 
   render() {
     let notes = this.state.actualnotes;
+    console.log("sorting: ", this.state.sorting);
+    notes = notes.sort((a, b) =>
+      this.state.sorting === "oldest to newest"
+        ? a.date - b.date
+        : b.date - a.date
+    );
     console.log("render notes:", notes);
+    const fontsize =
+      this.state.fontSize == "small"
+        ? 15
+        : this.state.fontSize == "normal"
+        ? 17
+        : 20;
+
     const renderItem = ({ item }) => {
+      let dates = new Date(item.date);
+      const options = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+      dates = dates.toLocaleDateString("pl-PL", options);
+
       return (
         <TouchableOpacity
-          style={{ ...styles.note, backgroundColor: item.color }}
+          style={{ ...this.styles.note, backgroundColor: item.color }}
           onLongPress={() => this.showAlert(item.id)}
           onPress={() => {
             this.props.navigation.navigate("EditNote", {
@@ -114,30 +182,40 @@ class Notes extends Component {
             });
           }}
         >
-          <View style={styles.badge}>
-            <Text key="cat" style={styles.badgeText}>
+          <View style={this.styles.badge}>
+            <Text key="cat" style={this.styles.badgeText}>
               {item.category}
             </Text>
           </View>
-          <Text key="date" style={{ ...styles.text, textAlign: "right" }}>
-            {item.date}
+          <Text
+            key="date"
+            style={{
+              ...this.styles.text,
+              textAlign: "right",
+              fontSize: fontsize,
+            }}
+          >
+            {dates}
           </Text>
-          <Text key="title" style={{ ...styles.text, fontSize: 25 }}>
+          <Text
+            key="title"
+            style={{ ...this.styles.text, fontSize: fontsize + 5 }}
+          >
             {item.title}
           </Text>
-          <Text key="desc" style={styles.text}>
+          <Text key="desc" style={{ ...this.styles.text, fontSize: fontsize }}>
             {item.desc}
           </Text>
         </TouchableOpacity>
       );
     };
     return (
-      <View key="vvvvv" style={styles.container}>
+      <View key="vvvvv" style={this.styles.container}>
         <TextInput
           ref={(input) => {
             this.filterInput = input;
           }}
-          style={styles.input}
+          style={this.styles.input}
           underlineColorAndroid="#666699"
           placeholder="Filter..."
           placeholderTextColor="white"
@@ -147,7 +225,7 @@ class Notes extends Component {
           }}
         />
         <FlatList
-          style={styles.flatlist}
+          style={this.styles.flatlist}
           data={notes}
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
@@ -157,42 +235,5 @@ class Notes extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#333350",
-    paddingTop: 10,
-  },
-  note: {
-    padding: 15,
-    margin: 10,
-    width: 170,
-    height: 170,
-    color: "white",
-    borderRadius: 8,
-  },
-  text: {
-    fontSize: 17,
-    color: "white",
-  },
-  badge: {
-    flexDirection: "row",
-  },
-  badgeText: {
-    padding: 7,
-    borderRadius: 12,
-    backgroundColor: "#333350",
-    color: "#fff",
-    textAlign: "center",
-  },
-  input: {
-    textAlign: "center",
-    height: 60,
-    width: 240,
-    alignSelf: "center",
-    color: "white",
-  },
-});
 
 export default Notes;

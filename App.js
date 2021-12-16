@@ -1,5 +1,12 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, Alert } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  Alert,
+  TouchableOpacity,
+  Touchable,
+} from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import {
   DrawerContentScrollView,
@@ -7,11 +14,13 @@ import {
   DrawerItem,
   createDrawerNavigator,
 } from "@react-navigation/drawer";
+import { Octicons } from "@expo/vector-icons";
 import AddNote from "./components/AddNote";
 import Notes from "./components/Notes";
 import AddCategory from "./components/AddCategory.js";
 import EditNote from "./components/EditNote.js";
-
+import Settings from "./components/Settings.js";
+let navigator;
 const Drawer = createDrawerNavigator();
 
 export default function App() {
@@ -34,6 +43,16 @@ export default function App() {
           component={Notes}
           options={{
             ...headerStyles,
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => {
+                  navigator.navigation.navigate("Settings");
+                }}
+                style={styles.kebab}
+              >
+                <Octicons name="kebab-vertical" size={24} color="white" />
+              </TouchableOpacity>
+            ),
           }}
         />
         <Drawer.Screen
@@ -57,12 +76,20 @@ export default function App() {
             ...headerStyles,
           }}
         />
+        <Drawer.Screen
+          name="Settings"
+          component={Settings}
+          options={{
+            ...headerStyles,
+          }}
+        />
       </Drawer.Navigator>
     </NavigationContainer>
   );
 }
 
 function CustomDrawerContent(props) {
+  navigator = props;
   return (
     <DrawerContentScrollView {...props}>
       <DrawerItem
@@ -109,7 +136,7 @@ function CustomDrawerContent(props) {
         onPress={() => {
           Alert.alert(
             "Info",
-            "app name: My Notes\nauthor: Maciej Bednarz\nversion: 1.0.0"
+            "app name: My Notes\nauthor: Maciej Bednarz\nversion: 3.0.0"
           );
         }}
       />
@@ -128,6 +155,12 @@ const styles = StyleSheet.create({
   iconBig: {
     width: 100,
     height: 100,
+  },
+  kebab: {
+    width: 24,
+    height: 24,
+    justifyContent: "center",
+    alignContent: "center",
   },
 });
 
